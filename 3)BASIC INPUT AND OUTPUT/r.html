@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Multi-Select Dropdown</title>
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            margin: 0;
+        }
+
+        .dropdown-container {
+            position: relative;
+            width: 200px;
+        }
+
+        .dropdown {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            cursor: pointer;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .options {
+            position: absolute;
+            top: 100%;
+            left: 0;
+            width: 100%;
+            max-height: 150px;
+            overflow-y: auto;
+            border: 1px solid #ccc;
+            border-top: none;
+            border-radius: 0 0 4px 4px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            display: none;
+        }
+
+        .options.active {
+            display: block;
+        }
+
+        .option {
+            padding: 8px;
+            cursor: pointer;
+            user-select: none;
+        }
+
+        .option:hover {
+            background-color: #f0f0f0;
+        }
+
+        .selected-items {
+            margin-top: 10px;
+        }
+
+        .selected-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 5px;
+            background-color: #e6f7ff;
+            margin-bottom: 5px;
+        }
+
+        .remove-icon {
+            cursor: pointer;
+            margin-left: 5px;
+        }
+    </style>
+</head>
+<body>
+
+<div class="dropdown-container">
+    <div class="dropdown" onclick="toggleOptions()">
+        Select items
+    </div>
+    <div class="options" id="options">
+        <div class="option" onclick="selectItem('Option 1')">Option 1</div>
+        <div class="option" onclick="selectItem('Option 2')">Option 2</div>
+        <div class="option" onclick="selectItem('Option 3')">Option 3</div>
+        <!-- Add more options as needed -->
+    </div>
+    <div class="selected-items" id="selectedItems"></div>
+</div>
+
+<script>
+    function toggleOptions() {
+        const options = document.getElementById('options');
+        options.classList.toggle('active');
+    }
+
+    function selectItem(item) {
+        const selectedItemsContainer = document.getElementById('selectedItems');
+        const selectedItems = selectedItemsContainer.innerHTML;
+
+        if (selectedItems.includes(item)) {
+            // Item is already selected, do nothing
+            return;
+        }
+
+        // Append the selected item to the container
+        selectedItemsContainer.innerHTML += `
+            <div class="selected-item">
+                <span>${item}</span>
+                <span class="remove-icon" onclick="removeItem(this)">❌</span>
+            </div>`;
+
+        // Optionally, you can clear the selected item in the dropdown
+        toggleOptions();
+    }
+
+    function removeItem(element) {
+        const selectedItemsContainer = document.getElementById('selectedItems');
+        const selectedItem = element.parentNode;
+        selectedItemsContainer.removeChild(selectedItem);
+    }
+</script>
+
+</body>
+</html>

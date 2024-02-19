@@ -1,0 +1,268 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Product List</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+        }
+
+        h1 {
+            text-align: center;
+        }
+
+        #productList {
+            list-style-type: none;
+            padding: 0;
+        }
+
+        .product {
+            border: 1px solid #ddd;
+            margin: 10px;
+            padding: 10px;
+            background-color: #f9f9f9;
+            cursor: pointer;
+        }
+
+        .selected {
+            background-color: lightgreen;
+        }
+
+        #showSelectedButton {
+            margin-bottom: 10px;
+            display: none;
+        }
+
+        #selectedItemsPopup {
+            display: none;
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            padding: 20px;
+            background-color: #fff;
+            border: 1px solid #ddd;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            z-index: 1000;
+        }
+    </style>
+    <style>
+        .dropdown-container {
+            position: relative;
+            width: 200px;
+        }
+
+        .dropdown {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            cursor: pointer;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .options {
+            position: absolute;
+            top: 100%;
+            left: 0;
+            width: 100%;
+            max-height: 150px;
+            overflow-y: auto;
+            border: 1px solid #ccc;
+            border-top: none;
+            border-radius: 0 0 4px 4px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            display: none;
+        }
+
+        .options.active {
+            display: block;
+        }
+
+        .option {
+            padding: 8px;
+            cursor: pointer;
+            user-select: none;
+        }
+
+        .option:hover {
+            background-color: #f0f0f0;
+        }
+
+        .selected-items {
+            margin-top: 10px;
+        }
+
+        .selected-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 5px;
+            background-color: #e6f7ff;
+            margin-bottom: 5px;
+        }
+
+        .remove-icon {
+            cursor: pointer;
+            margin-left: 5px;
+        }
+    </style>
+</head>
+
+<body>
+
+    <h1>Product List</h1>
+
+    <button id="showSelectedButton" onclick="showSelectedItems()">Show Selected Items</button>
+
+    <ul id="productList"></ul>
+
+    <div id="selectedItemsPopup">
+        <h2>Selected Items</h2>
+        <ul id="selectedItemsList"></ul>
+        <div class="dropdown-container">
+            <div class="dropdown" onclick="toggleOptions()">
+                Select items
+            </div>
+            <div class="options" id="options">
+                <div class="option" onclick="selectItem('employee-1')">employee-1</div>
+                <div class="option" onclick="selectItem('employee-2')">employee-2</div>
+                <div class="option" onclick="selectItem('employee-3')">employee-3</div>
+                <!-- Add more options as needed -->
+            </div>
+            <div class="selected-items" id="selectedItems"></div>
+        </div>
+        <button onclick="Assign()">Assign</button>
+        <button onclick="closePopup()">Close</button>
+    </div>
+
+    <script>
+        // Sample product data
+        const products = [
+            { id: 1, name: 'Task 1', price: "01/01/2024" },
+            { id: 2, name: 'Task 2', price: "01/01/2024" },
+            { id: 3, name: 'Task 3', price: "01/01/2024" },
+            { id: 4, name: 'Task 4', price: "02/01/2024" },
+            { id: 5, name: 'Task 5', price: "03/01/2024" },
+            { id: 6, name: 'Task 6', price: "04/01/2024" },
+            { id: 7, name: 'Task 7', price: "04/01/2024" },
+            { id: 8, name: 'Task 8', price: "04/01/2024" },
+            { id: 9, name: 'Task 9', price: "05/01/2024" },
+            { id: 10, name: 'Task 10', price: "07/01/2024" }
+        ];
+
+        // Array to store selected products
+        const selectedProducts = [];
+
+        // Function to render the product list
+        function renderProductList() {
+            const productListElement = document.getElementById('productList');
+
+            products.forEach(product => {
+                const listItem = document.createElement('li');
+                listItem.className = 'product';
+                listItem.innerHTML = `<strong>${product.name}</strong> - ${product.price}`;
+                listItem.addEventListener('click', () => toggleProductSelection(product, listItem));
+                productListElement.appendChild(listItem);
+            });
+        }
+
+        // Function to toggle product selection
+        function toggleProductSelection(product, listItem) {
+            // Toggle selection class
+            listItem.classList.toggle('selected');
+
+            // Add or remove product from selectedProducts array
+            const isSelected = listItem.classList.contains('selected');
+            if (isSelected) {
+                selectedProducts.push(product);
+            } else {
+                const index = selectedProducts.findIndex(p => p.id === product.id);
+                if (index !== -1) {
+                    selectedProducts.splice(index, 1);
+                }
+            }
+
+            // Show or hide the "Show Selected Items" button based on selection
+            const showSelectedButton = document.getElementById('showSelectedButton');
+            showSelectedButton.style.display = selectedProducts.length > 0 ? 'block' : 'none';
+        }
+
+        // Function to show selected items in a popup
+        function showSelectedItems() {
+            const popup = document.getElementById('selectedItemsPopup');
+            const selectedItemsList = document.getElementById('selectedItemsList');
+
+            // Clear previous items
+            selectedItemsList.innerHTML = '';
+
+            // Populate the popup with selected items
+            selectedProducts.forEach(product => {
+                const listItem = document.createElement('li');
+                listItem.textContent = `${product.name} - ${product.price}`;
+                selectedItemsList.appendChild(listItem);
+            });
+
+            // Display the popup
+            popup.style.display = 'block';
+        }
+
+        // Function to close the popup
+        function closePopup() {
+            const popup = document.getElementById('selectedItemsPopup');
+            popup.style.display = 'none';
+        }
+
+        // Function to close the popup
+        function Assign() {
+            const popup = document.getElementById('selectedItemsPopup');
+            popup.style.display = 'none';
+            alert("Submitted Successfully");
+        }
+
+        // Call the function to render the product list on page load
+        window.onload = renderProductList;
+    </script>
+
+    <script>
+        function toggleOptions() {
+            const options = document.getElementById('options');
+            options.classList.toggle('active');
+        }
+
+        function selectItem(item) {
+            const selectedItemsContainer = document.getElementById('selectedItems');
+            const selectedItems = selectedItemsContainer.innerHTML;
+
+            if (selectedItems.includes(item)) {
+                // Item is already selected, do nothing
+                return;
+            }
+
+            // Append the selected item to the container
+            selectedItemsContainer.innerHTML += `
+            <div class="selected-item">
+                <span>${item}</span>
+                <span class="remove-icon" onclick="removeItem(this)">❌</span>
+            </div>`;
+
+            // Optionally, you can clear the selected item in the dropdown
+            toggleOptions();
+        }
+
+        function removeItem(element) {
+            const selectedItemsContainer = document.getElementById('selectedItems');
+            const selectedItem = element.parentNode;
+            selectedItemsContainer.removeChild(selectedItem);
+        }
+    </script>
+
+</body>
+
+</html>
